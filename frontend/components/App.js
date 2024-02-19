@@ -5,6 +5,7 @@ import LoginForm from './LoginForm'
 import Message from './Message'
 import ArticleForm from './ArticleForm'
 import Spinner from './Spinner'
+import { update } from 'lodash'
 
 const articlesUrl = 'http://localhost:9000/api/articles'
 const loginUrl = 'http://localhost:9000/api/login'
@@ -151,11 +152,22 @@ export default function App() {
           <NavLink id="articlesScreen" to="/articles">Articles</NavLink>
         </nav>
         <Routes>
-          <Route path="/" element={<LoginForm onLogin={login} />} />
+          <Route path="/" element={<LoginForm login={login} />} />
           <Route path="articles" element={
             <>
-              <ArticleForm onSave={postArticle} />
-              <Articles articles={articles} onDelete={deleteArticle} onUpdate={updateArticle} />
+              <ArticleForm 
+                onSave={postArticle}
+                updateArticle={updateArticle}
+                setCurrentArticleId={setCurrentArticleId}
+                postArticle={postArticle}
+                currentArticleId={articles.find(article => article.article_id === currentArticleId)}
+               />
+              <Articles 
+                articles={articles} 
+                getArticles={getArticles}
+                deleteArticle={deleteArticle} 
+                updateArticle={updateArticle}
+                setCurrentArticleId={setCurrentArticleId} />
             </>
           } />
         </Routes>

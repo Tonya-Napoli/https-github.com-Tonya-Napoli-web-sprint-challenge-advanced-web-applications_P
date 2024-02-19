@@ -4,7 +4,7 @@ import { set } from 'lodash';
 
 const initialFormValues = { title: '', text: '', topic: '' }
 
-export default function ArticleForm(postArticle, updateArticle, setCurrentArticle, currentArticle) {
+export default function ArticleForm({postArticle, updateArticle, setCurrentArticle, currentArticle}) {
   const [values, setValues] = useState(initialFormValues)
   // ✨ where are my props? Destructure them here
 

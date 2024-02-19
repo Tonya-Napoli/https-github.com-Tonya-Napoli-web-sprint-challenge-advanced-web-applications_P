@@ -6,6 +6,9 @@ import Message from './Message'
 import ArticleForm from './ArticleForm'
 import Spinner from './Spinner'
 import { update } from 'lodash'
+import axiosWithAuth from '../axios/index2'
+import axios from 'axios'
+
 
 const articlesUrl = 'http://localhost:9000/api/articles'
 const loginUrl = 'http://localhost:9000/api/login'
@@ -73,8 +76,10 @@ export default function App() {
     // If something goes wrong, check the status of the response:
     // if it's a 401 the token might have gone bad, and we should redirect to login.
     // Don't forget to turn off the spinner!
-
+    
     try {
+      
+
       const response = await axiosWithAuth().get(articlesUrl);
       setArticles(response.data.articles);
       setMessage(`Articles loaded successfully`);
@@ -152,11 +157,11 @@ export default function App() {
           <NavLink id="articlesScreen" to="/articles">Articles</NavLink>
         </nav>
         <Routes>
-          <Route path="/" element={<LoginForm login={login} />} />
+          <Route path="/login" element={<LoginForm login={login} />} />
           <Route path="articles" element={
             <>
               <ArticleForm 
-                onSave={postArticle}
+                
                 updateArticle={updateArticle}
                 setCurrentArticleId={setCurrentArticleId}
                 postArticle={postArticle}
@@ -166,8 +171,9 @@ export default function App() {
                 articles={articles} 
                 getArticles={getArticles}
                 deleteArticle={deleteArticle} 
-                updateArticle={updateArticle}
-                setCurrentArticleId={setCurrentArticleId} />
+                setCurrentArticleId={setCurrentArticleId}
+                
+                />
             </>
           } />
         </Routes>

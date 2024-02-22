@@ -57,7 +57,7 @@ const App = () => {
       const { data } = await axiosWithAuth().get('/articles');
       setArticles(data.articles);
       console.log('Articles successfully fetched:', data.articles);
-      setMessage('Articles loaded successfully');
+      setMessage(data.message);
     } catch (error) {
       setMessage('Failed to fetch articles: ' + error.toString());
       if (error.response?.status === 401) redirectToLogin();

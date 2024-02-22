@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import PT from 'prop-types'
 import { set } from 'lodash';
+import axios from 'axios'
 
 const initialFormValues = { title: '', text: '', topic: '' }
 
@@ -9,6 +10,7 @@ export default function ArticleForm({postArticle, updateArticle, setCurrentArtic
   // ✨ where are my props? Destructure them here
 
   useEffect(() => {
+    console.log('ArticleForm useEffect running, currentArticle');
     if (currentArticle) {
       setValues({
         title: currentArticle.title,

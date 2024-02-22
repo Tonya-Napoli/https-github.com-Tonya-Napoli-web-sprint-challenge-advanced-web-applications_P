@@ -29,22 +29,17 @@ export default function LoginForm( { login }) {
     setValues(initialFormValues);
   }
 
-  /*const isDisabled = () => {
-                                                                                            // ✨ implement
-    // Trimmed username must be >= 3, and
-    // trimmed password must be >= 8 for
-    // the button to become enabled
-    const { username, password } = values;
-    return !(username.trim().length >= 3 && password.trim().length >= 8);
-  }*/
-
   const isDisabled = () => {
     // Trim values and check their lengths
     const trimmedUsername = values.username.trim();
     const trimmedPassword = values.password.trim();
-    return trimmedUsername.length < 3 || trimmedPassword.length < 8;
-  };
-  
+    
+    // Determine if button should be disabled
+    const disabledState = trimmedUsername.length < 3 || trimmedPassword.length < 8;
+    
+    console.log(`Button disabled state: ${disabledState}`);
+    return disabledState;
+};
 
   return (
     <form id="loginForm" onSubmit={onSubmit}>

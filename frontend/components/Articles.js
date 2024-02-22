@@ -1,17 +1,28 @@
-import React, { useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import { Navigate } from 'react-router-dom';
 import PT from 'prop-types';
+import axiosWithAuth from '../axios';
 
-export default function Articles({articles, getArticles, deleteArticle, setCurrentArticleId, currentArticleId, setMessage, message}) {
-  const token = localStorage.getItem('token');
-  if (!token) {
-    return <Navigate to="/login" replace />;
-  }
+export default function Articles({getArticles, deleteArticle, setCurrentArticleId, currentArticleId, setMessage, message}) {
+
+  const [articles, setArticles] = useState([]);
 
   useEffect(() => {
-    getArticles();
-  }, [getArticles]);
+    const fetchArticles = async () => {
+      try {
+        const { data } = await axiosWithAuth().get('/articles');
+        setArticles(data.articles); // Adjust according to the actual structure of the response
+        console.log('Articles successfully fetched:', data.articles);
+        if (setMessage) setMessage('Articles loaded successfully.');
+      } catch (error) {
+        console.error('Failed to fetch articles:', error);
+        if (setMessage) setMessage('Articles failed to load: ' + error.toString());
+      }
+    };
 
+    fetchArticles();
+  }, []);
+  
   return (
     <div className="articles">
       <h2>Articles</h2>

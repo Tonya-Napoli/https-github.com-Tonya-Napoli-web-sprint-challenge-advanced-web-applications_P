@@ -45,10 +45,12 @@ const App = () => {
 
   // Logout function
   const logout = () => {
+    redirectToLogin();
     localStorage.removeItem('token');
     setMessage('Goodbye!');
-    redirectToLogin();
+    
   };
+  
 
   // Fetch articles
   const fetchArticles = async () => {

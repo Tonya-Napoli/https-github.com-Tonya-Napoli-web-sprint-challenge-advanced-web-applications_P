@@ -1,4 +1,5 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+const webpack = require('webpack')
 const path = require('path')
 
 const DEVELOPMENT = 'development'
@@ -22,6 +23,16 @@ const BUNDLE_FILE = 'index.js'
 const SOURCE_MAP = IS_DEV ? 'source-map' : false
 
 const config = {
+
+  resolve: {
+    fallback: {
+      "crypto": require.resolve('crypto-browserify'),
+      "stream": require.resolve('stream-browserify'),
+      "util": require.resolve('util/'),
+      "process": require.resolve('process/browser'),
+
+    },
+  },
   entry: INDEX_JS_PATH,
   mode: ENV,
   output: {
@@ -34,6 +45,9 @@ const config = {
     new HtmlWebpackPlugin({
       template: INDEX_HTML_PATH,
     }),
+    new webpack.ProvidePlugin({
+      process: 'process/browser',
+    })
   ],
   devServer: {
     static: path.join(__dirname, DIST_FOLDER),
@@ -64,6 +78,7 @@ const config = {
     ],
   },
 }
+
 
 if (!IS_DEV) {
   config.module.rules.push({

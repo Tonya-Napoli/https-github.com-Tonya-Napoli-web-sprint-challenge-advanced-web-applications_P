@@ -1,15 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { NavLink, Routes, Route, useNavigate, Navigate } from 'react-router-dom';
 import axios from 'axios';
-
+import axiosWithAuth from '../axios';
 import Articles from './Articles';
 import LoginForm from './LoginForm';
 import Message from './Message';
 import ArticleForm from './ArticleForm';
 import Spinner from './Spinner';
-
-// axiosWithAuth implementation
-import axiosWithAuth from '../axios';
+import ProtectedRoute from './ProtectedRoute';
+import {  NavLink, 
+          Routes, 
+          Route, 
+          useNavigate, 
+          Navigate,
+          BrowserRouter as Router,
+          Link  } from 'react-router-dom';
+import { set } from 'lodash';
+import { getArticles } from '../../backend/helpers';
 
 const App = () => {
   const [message, setMessage] = useState('');
@@ -26,6 +32,7 @@ const App = () => {
 
   // Navigate to login
   const redirectToLogin = () => navigate('/login');
+
 
   // Login function
   const login = async (credentials) => {
@@ -50,10 +57,8 @@ const App = () => {
     setMessage('Goodbye!');
     
   };
-  
 
-  // Fetch articles
-  const fetchArticles = async () => {
+  const getArticles = async () => {
     try {
       setSpinnerOn(true);
       const { data } = await axiosWithAuth().get('/articles');
@@ -69,8 +74,49 @@ const App = () => {
   };
 
   useEffect(() => {
-    if (isAuth()) fetchArticles();
+    if (isAuth()) getArticles();
   }, []);
+
+  const postArticle = async (article) => {
+    try {
+      setSpinnerOn(true);
+      const response = await axiosWithAuth().post('/articles', article);
+      setArticles([...articles, response.data.article]);
+      setMessage('Article added successfully.');
+      getArticles(); //Refresh articles list
+    } catch (error) { 
+      setMessage(`Failed to add article: ${error.toString()}`);
+    } finally {
+      setSpinnerOn(false);
+    }
+  };
+    
+  const updateArticle = async ({ article_id, article }) => {
+    try {
+      setSpinnerOn(true);
+      const response = await axiosWithAuth().put(`/articles/${article_id}`, article);
+      setMessage(`Article updated successfully.`);
+      getArticles(); //Refresh articles list
+    } catch (error) {
+      setMessage(`Failed to update article: ${error.toString()}`);
+    } finally {
+      setSpinnerOn(false);
+    }
+  };
+   
+
+  const deleteArticle = async (article_id) => {
+    try {
+      setSpinnerOn(true);
+      axiosWithAuth().delete(`/articles/${article_id}`);
+      setMessage(`Article deleted successfully.`);
+      getArticles(); //Refresh articles list
+    } catch (error) {
+      setMessage(`Failed to delete article: ${error.toString()}`);
+    } finally {
+      setSpinnerOn(false);
+    }
+  }
 
   return (
     <>
@@ -82,12 +128,13 @@ const App = () => {
         <nav>
           <NavLink id="loginScreen" to="/login">Login</NavLink>
           <NavLink id="articlesScreen" to="/articles">Articles</NavLink>
-          <button onClick={fetchArticles}>Fetch Articles</button>
+          
         </nav>
         <Routes>
           <Route path="/login" element={<LoginForm login={login} />} />
-          <Route path="/articles" element={
-            isAuth() ? (
+          <Route path="/articles" 
+          element={
+            <ProtectedRoute>
               <>
                 <ArticleForm
                   updateArticle={() => {}}
@@ -97,15 +144,14 @@ const App = () => {
                 />
                 <Articles
                   articles={articles}
-                  getArticles={fetchArticles}
+                  getArticles={getArticles}
                   deleteArticle={() => {}}
                   setCurrentArticleId={setCurrentArticleId}
                 />
               </>
-            ) : (
-              <Navigate replace to="/login" />
-            )
-          } />
+              </ProtectedRoute>
+          }
+          />
           <Route path="*" element={<Navigate replace to="/login" />} />
         </Routes>
         <footer>Bloom Institute of Technology 2022</footer>

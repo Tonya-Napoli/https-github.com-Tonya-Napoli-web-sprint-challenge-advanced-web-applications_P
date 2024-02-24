@@ -1,16 +1,21 @@
 import React, { useEffect, useState } from 'react'
 import PT from 'prop-types'
-import { set } from 'lodash';
 import axios from 'axios'
 
 const initialFormValues = { title: '', text: '', topic: '' }
 
-export default function ArticleForm({postArticle, updateArticle, setCurrentArticleId, currentArticle}) {
+export default function ArticleForm({
+  postArticle, 
+  updateArticle, 
+  setCurrentArticleId, 
+  currentArticle
+}) {
   const [values, setValues] = useState(initialFormValues)
+  console.log('ArticleFormProps:, { currentArticle, updateArticle, setCurrentArticleId }')
   // ✨ where are my props? Destructure them here
 
   useEffect(() => {
-    console.log('ArticleForm useEffect running, currentArticle');
+    console.log('ArticleForm useEffect running, currentArticle', currentArticle);
     if (currentArticle) {
       setValues({
         title: currentArticle.title,
@@ -20,6 +25,7 @@ export default function ArticleForm({postArticle, updateArticle, setCurrentArtic
     } else {
       setValues(initialFormValues)
     }
+   
     // ✨ implement
     // Every time the `currentArticle` prop changes, we should check it for truthiness:
     // if it's truthy, we should set its title, text and topic into the corresponding
@@ -27,12 +33,18 @@ export default function ArticleForm({postArticle, updateArticle, setCurrentArtic
   }, [currentArticle]);
 
   const onChange = evt => {
-    const { id, value } = evt.target
-    setValues({ ...values, [id]: value })
+    const { id, value } = evt.target;
+    console.log(`onChange??? Changing ${id}:`, value)//log input being changed
+    setValues(values => {
+      const newValues = { ...values, [id]: value }
+      console.log(`onChange New values!!!:`, newValues)
+      return newValues;
+    })
   }
 
   const onSubmit = evt => {
     evt.preventDefault()
+    console.log('Submitting form:', values);
     if (currentArticle) {
       updateArticle({ ...values, article_id: currentArticle.article_id});
     } else {

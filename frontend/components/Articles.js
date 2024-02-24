@@ -8,7 +8,7 @@ export default function Articles({getArticles, deleteArticle, setCurrentArticleI
   const [articles, setArticles] = useState([]);
 
   useEffect(() => {
-    const fetchArticles = async () => {
+    const getArticles = async () => {
       try {
         const { data } = await axiosWithAuth().get('/articles');
         setArticles(data.articles); // Adjust according to the actual structure of the response
@@ -20,7 +20,7 @@ export default function Articles({getArticles, deleteArticle, setCurrentArticleI
       }
     };
 
-    fetchArticles();
+    getArticles();
   }, []);
   
   return (
@@ -29,16 +29,17 @@ export default function Articles({getArticles, deleteArticle, setCurrentArticleI
       {
         articles.length === 0
           ? 'No articles yet'
-          : articles.map(art => (
-              <div className="article" key={art.article_id}>
+          : articles.map(article => (
+              <div className="article" key={article.article_id}>
                 <div>
-                  <h3>{art.title}</h3>
-                  <p>{art.text}</p>
-                  <p>Topic: {art.topic}</p>
+                  <h3>{article.title}</h3>
+                  <p>{article.text}</p>
+                  <p>Topic: {article.topic}</p>
                 </div>
                 <div>
-                  <button onClick={() => setCurrentArticleId(art.article_id)}>Edit</button>
-                  <button onClick={() => deleteArticle(art.article_id)}>Delete</button>
+                <button onClick={() => deleteArticle(article.article_id)}>Delete</button>
+                <button onClick={() => setCurrentArticleId(article.article_id)}>Edit</button>
+
                 </div>
               </div>
             ))

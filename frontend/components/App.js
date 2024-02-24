@@ -3,8 +3,8 @@ import axios from 'axios';
 import axiosWithAuth from '../axios';
 import Articles from './Articles';
 import LoginForm from './LoginForm';
-import Message from './Message';
 import ArticleForm from './ArticleForm';
+import Message from './Message';
 import Spinner from './Spinner';
 import ProtectedRoute from './ProtectedRoute';
 import {  NavLink, 
@@ -14,8 +14,9 @@ import {  NavLink,
           Navigate,
           BrowserRouter as Router,
           Link  } from 'react-router-dom';
-import { set } from 'lodash';
+//import { set } from 'lodash';
 import { getArticles } from '../../backend/helpers';
+//import { get, update } from 'lodash';
 
 const App = () => {
   const [message, setMessage] = useState('');
@@ -33,7 +34,6 @@ const App = () => {
   // Navigate to login
   const redirectToLogin = () => navigate('/login');
 
-
   // Login function
   const login = async (credentials) => {
     try {
@@ -42,6 +42,7 @@ const App = () => {
       localStorage.setItem('token', data.token);
       console.log('Login response:', data);
       setMessage(data.message);
+      setIsLoggedIn(true);
       redirectToArticles();
     } catch (error) {
       setMessage('Login failed: ' + error.toString());
@@ -55,7 +56,7 @@ const App = () => {
     redirectToLogin();
     localStorage.removeItem('token');
     setMessage('Goodbye!');
-    
+    setIsLoggedIn(false);
   };
 
   const getArticles = async () => {
@@ -72,46 +73,63 @@ const App = () => {
       setSpinnerOn(false);
     }
   };
+const [isLoggedIn, setIsLoggedIn] = useState(false);
+useEffect(() => {
+  if (isLoggedIn) {
+    getArticles();
+  }
+}, [isLoggedIn]);
 
-  useEffect(() => {
-    if (isAuth()) getArticles();
-  }, []);
+useEffect(() => {
+  setIsLoggedIn(!!localStorage.getItem('token'));
+}, []);
 
-  const postArticle = async (article) => {
+useEffect (() => {
+  console.log("Current articles state:", articles)
+
+}, [articles]);
+
+  const postArticle = async (newArticle) => {
     try {
       setSpinnerOn(true);
-      const response = await axiosWithAuth().post('/articles', article);
-      setArticles([...articles, response.data.article]);
+      const { data } = await axiosWithAuth().post('/articles', newArticle);
+      setArticles(prevArticles => [...prevArticles, data.article]);
+      console.log("postArticle, Articles after add:", articles)
       setMessage('Article added successfully.');
-      getArticles(); //Refresh articles list
-    } catch (error) { 
+    } catch (error) {
+      console.error('Error posting article:', error) 
       setMessage(`Failed to add article: ${error.toString()}`);
     } finally {
       setSpinnerOn(false);
     }
   };
     
-  const updateArticle = async ({ article_id, article }) => {
+  const updateArticle = async (articleToUpdate) => {
+    console.log('Edit Article:', articleToUpdate);
     try {
       setSpinnerOn(true);
-      const response = await axiosWithAuth().put(`/articles/${article_id}`, article);
+      const { data } = await axiosWithAuth().put(`/articles/${articleToUpdate.article_id}`, articleToUpdate);
       setMessage(`Article updated successfully.`);
-      getArticles(); //Refresh articles list
+      await getArticles(); //Refresh articles list
     } catch (error) {
+      console.error('Error updating article:', error)
       setMessage(`Failed to update article: ${error.toString()}`);
     } finally {
       setSpinnerOn(false);
     }
   };
    
-
   const deleteArticle = async (article_id) => {
+    console.log('Delete Article:', article_id);
+    console.log("Articles after delete:", articles);  
     try {
       setSpinnerOn(true);
-      axiosWithAuth().delete(`/articles/${article_id}`);
+      await axiosWithAuth().delete(`/articles/${article_id}`);
+      setArticles(prevArticles => prevArticles.filter(article => article.article_id !== article_id));
       setMessage(`Article deleted successfully.`);
-      getArticles(); //Refresh articles list
+      await getArticles(); //Refresh articles list
     } catch (error) {
+      console.error('Error deleting article:', error)
       setMessage(`Failed to delete article: ${error.toString()}`);
     } finally {
       setSpinnerOn(false);
@@ -122,7 +140,7 @@ const App = () => {
     <>
       <Spinner on={spinnerOn} />
       <Message message={message} />
-      <button id="logout" onClick={logout}>Logout</button>
+      <button id="logout" onClick={logout}>Logout from app</button>
       <div id="wrapper" style={{ opacity: spinnerOn ? '0.25' : '1' }}>
         <h1>Advanced Web Applications</h1>
         <nav>
@@ -137,15 +155,15 @@ const App = () => {
             <ProtectedRoute>
               <>
                 <ArticleForm
-                  updateArticle={() => {}}
+                  updateArticle= {updateArticle}
                   setCurrentArticleId={setCurrentArticleId}
-                  postArticle={() => {}}
-                  currentArticleId={currentArticleId}
+                  postArticle= {postArticle}
+                  currentArticleId={articles.find(article => article.article_id === currentArticleId)}
                 />
                 <Articles
-                  articles={articles}
                   getArticles={getArticles}
-                  deleteArticle={() => {}}
+                  articles={articles}
+                  deleteArticle= {deleteArticle}
                   setCurrentArticleId={setCurrentArticleId}
                 />
               </>

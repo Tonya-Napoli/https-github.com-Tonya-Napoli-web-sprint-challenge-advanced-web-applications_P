@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import PT from 'prop-types'
-import axios from 'axios'
+
 
 const initialFormValues = { title: '', text: '', topic: '' }
 
@@ -39,12 +39,12 @@ export default function ArticleForm({
   const onChange = evt => {
     const { id, value } = evt.target;
     console.log(`onChange??? Changing ${id}:`, value)//log input being changed
-    setValues(values => {
-      const newValues = { ...values, [id]: value }
-      console.log(`onChange New values!!!:`, newValues)
-      return newValues;
-    })
-  }
+    setValues((preValues) => ({
+      ...preValues,
+      [id]: value,
+    }));
+  };
+     
 
   const onSubmit = evt => {
     evt.preventDefault()
@@ -57,7 +57,8 @@ export default function ArticleForm({
     } else {
       postArticle(values);
     }
-    setValues(initialFormValues)
+    setValues(initialFormValues); //resetting form submission
+    setCurrentArticleId(null); //resetting current article ID to null after editing
   }
 
   const isDisabled = () => {

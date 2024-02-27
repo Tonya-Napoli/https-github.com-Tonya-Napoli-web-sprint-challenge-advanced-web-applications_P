@@ -15,7 +15,7 @@ import {  NavLink,
           //.BrowserRouter as Router,
          // Link  
         } from 'react-router-dom';
-//import { getArticles } from '../../backend/helpers';
+import { getArticles } from '../../backend/helpers';
 
 
 const articlesUrl = 'http://localhost:9000/api/articles'
@@ -31,12 +31,13 @@ const App = () => {
   const [articles, setArticles] = useState([]);
   const [spinnerOn, setSpinnerOn] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);   
+  const [forceUpdate, setForceUpdate] = useState(0);
   const navigate = useNavigate();
-
+ 
   const [currentArticleId, setCurrentArticleId] = useState(null);
-  const editArticle = (articleId) => {
-    const articleToEdit = articles.find(article => arrticle.article_id === articleId);
-    setCurrentArticleId(articleToEdit)
+  const editArticle = (article_id) => {
+    setCurrentArticleId(article_id);
+    //setCurrentArticleId(articleToEdit)
   }
 
   // Check token presence to manage access to private routes
@@ -139,6 +140,7 @@ useEffect(() => {
     try {
       setSpinnerOn(true);
       const { data } = await axiosWithAuth().post('/articles', newArticle);
+      await getArticles()
       setArticles(prevArticles => [...prevArticles, data.article]);
       console.log("postArticle, Articles after add:", articles)
       setMessage('Article added successfully.');
@@ -157,7 +159,7 @@ useEffect(() => {
       setSpinnerOn(true);
       const { data } = await axiosWithAuth().put(`/articles/${articleToUpdate.article_id}`, articleToUpdate);
       setMessage(`Article updated successfully.`);
-      //await getArticles(); //Refresh articles list
+      await getArticles(); //Refresh articles list
     } catch (error) {
       console.error('Error updating article:', error)
       setMessage(`Failed to update article: ${error.toString()}`);
@@ -182,6 +184,14 @@ useEffect(() => {
       setSpinnerOn(false);
     }
   }
+
+  const updateArticleState = (updatedArticle) => {
+    setArticles(currentArticles =>
+      currentArticles.map(article =>
+        article.article_id === updatedArticle.article_id ? updatedArticle: article
+        )
+        );
+      };
 
   return (
     <>

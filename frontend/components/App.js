@@ -29,10 +29,15 @@ const loginUrl = 'http://localhost:9000/api/login'
 const App = () => {
   const [message, setMessage] = useState('');
   const [articles, setArticles] = useState([]);
-  const [currentArticleId, setCurrentArticleId] = useState(null);
   const [spinnerOn, setSpinnerOn] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);   
   const navigate = useNavigate();
+
+  const [currentArticleId, setCurrentArticleId] = useState(null);
+  const editArticle = (articleId) => {
+    const articleToEdit = articles.find(article => arrticle.article_id === articleId);
+    setCurrentArticleId(articleToEdit)
+  }
 
   // Check token presence to manage access to private routes
   const isAuth = () => !!localStorage.getItem('token');
@@ -152,7 +157,7 @@ useEffect(() => {
       setSpinnerOn(true);
       const { data } = await axiosWithAuth().put(`/articles/${articleToUpdate.article_id}`, articleToUpdate);
       setMessage(`Article updated successfully.`);
-      await getArticles(); //Refresh articles list
+      //await getArticles(); //Refresh articles list
     } catch (error) {
       console.error('Error updating article:', error)
       setMessage(`Failed to update article: ${error.toString()}`);
@@ -163,13 +168,13 @@ useEffect(() => {
    
   const deleteArticle = async (article_id) => {
     console.log('Delete Article:', article_id);
-    console.log("Articles after delete:", articles);  
+    console.log("Articles before delete:", articles);  
     try {
       setSpinnerOn(true);
       await axiosWithAuth().delete(`/articles/${article_id}`);
       setArticles(prevArticles => prevArticles.filter(article => article.article_id !== article_id));
       setMessage(`Article deleted successfully.`);
-      await getArticles(); //Refresh articles list
+      //await getArticles(); //Refresh articles list
     } catch (error) {
       console.error('Error deleting article:', error)
       setMessage(`Failed to delete article: ${error.toString()}`);

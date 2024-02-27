@@ -4,6 +4,10 @@ import PT from 'prop-types';
 import axiosWithAuth from '../axios';
 
 export default function Articles({getArticles, deleteArticle, setCurrentArticleId, currentArticleId, setMessage, message}) {
+ // ✨ where are my props? Destructure them here
+
+  // ✨ implement conditional logic: if no token exists
+  // we should render a Navigate to login screen (React Router v.6)
 
   const [articles, setArticles] = useState([]);
 
@@ -24,6 +28,8 @@ export default function Articles({getArticles, deleteArticle, setCurrentArticleI
   }, []);
   
   return (
+     // ✨ fix the JSX: replace `Function.prototype` with actual functions
+    // and use the articles prop to generate articles
     <div className="articles">
       <h2>Articles</h2>
       {

@@ -12,33 +12,51 @@ import {  NavLink,
           Route, 
           useNavigate, 
           Navigate,
-          BrowserRouter as Router,
-          Link  } from 'react-router-dom';
-//import { set } from 'lodash';
-import { getArticles } from '../../backend/helpers';
-//import { get, update } from 'lodash';
+          //.BrowserRouter as Router,
+         // Link  
+        } from 'react-router-dom';
+//import { getArticles } from '../../backend/helpers';
+
+
+const articlesUrl = 'http://localhost:9000/api/articles'
+const loginUrl = 'http://localhost:9000/api/login'
+
+// ✨ Research `useNavigate` in React Router v.6
+//const navigate = useNavigate()
+//const redirectToLogin = () => { /* ✨ implement */ }
+//const redirectToArticles = () => { /* ✨ implement */ }
 
 const App = () => {
   const [message, setMessage] = useState('');
   const [articles, setArticles] = useState([]);
   const [currentArticleId, setCurrentArticleId] = useState(null);
   const [spinnerOn, setSpinnerOn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);   
   const navigate = useNavigate();
 
   // Check token presence to manage access to private routes
   const isAuth = () => !!localStorage.getItem('token');
 
-  // Navigate to articles after login
+// ✨ Research `useNavigate` in React Router v.6
+//const navigate = useNavigate()
+//const redirectToLogin = () => { /* ✨ implement */ }
+//const redirectToArticles = () => { /* ✨ implement */ 
   const redirectToArticles = () => navigate('/articles');
-
-  // Navigate to login
   const redirectToLogin = () => navigate('/login');
 
   // Login function
+   //const login = ({ username, password }) => {
+    // ✨ implement
+    // We should flush the message state, turn on the spinner
+    // and launch a request to the proper endpoint.
+    // On success, we should set the token to local storage in a 'token' key,
+    // put the server success message in its proper state, and redirect
+    // to the Articles screen. Don't forget to turn off the spinner!
+  //}
   const login = async (credentials) => {
     try {
       setSpinnerOn(true);
-      const { data } = await axios.post('http://localhost:9000/api/login', credentials);
+      const { data } = await axios.post(loginUrl, credentials);
       localStorage.setItem('token', data.token);
       console.log('Login response:', data);
       setMessage(data.message);
@@ -52,17 +70,33 @@ const App = () => {
   };
 
   // Logout function
+  // ✨ implement
+    // If a token is in local storage it should be removed,
+    // and a message saying "Goodbye!" should be set in its proper state.
+    // In any case, we should redirect the browser back to the login screen,
+    // using the helper above.
+  
   const logout = () => {
-    redirectToLogin();
     localStorage.removeItem('token');
     setMessage('Goodbye!');
     setIsLoggedIn(false);
+    redirectToLogin(); 
   };
 
+  //fetch articles
   const getArticles = async () => {
+    console.log(`getArticles called from ${articlesUrl}`)
+    // ✨ implement
+    // We should flush the message state, turn on the spinner
+    // and launch an authenticated request to the proper endpoint.
+    // On success, we should set the articles in their proper state and
+    // put the server success message in its proper state.
+    // If something goes wrong, check the status of the response:
+    // if it's a 401 the token might have gone bad, and we should redirect to login.
+    // Don't forget to turn off the spinner!
     try {
       setSpinnerOn(true);
-      const { data } = await axiosWithAuth().get('/articles');
+      const { data } = await axiosWithAuth().get(articlesUrl);
       setArticles(data.articles);
       console.log('Articles successfully fetched:', data.articles);
       setMessage(data.message);
@@ -73,7 +107,7 @@ const App = () => {
       setSpinnerOn(false);
     }
   };
-const [isLoggedIn, setIsLoggedIn] = useState(false);
+
 useEffect(() => {
   if (isLoggedIn) {
     getArticles();
@@ -84,12 +118,19 @@ useEffect(() => {
   setIsLoggedIn(!!localStorage.getItem('token'));
 }, []);
 
-useEffect (() => {
+/*useEffect (() => {
   console.log("Current articles state:", articles)
 
-}, [articles]);
+}, [articles]);*/
 
   const postArticle = async (newArticle) => {
+     //const postArticle = article => {
+    // ✨ implement
+    // The flow is very similar to the `getArticles` function.
+    // You'll know what to do! Use log statements or breakpoints
+    // to inspect the response from the server.
+  //}
+
     try {
       setSpinnerOn(true);
       const { data } = await axiosWithAuth().post('/articles', newArticle);
@@ -105,6 +146,7 @@ useEffect (() => {
   };
     
   const updateArticle = async (articleToUpdate) => {
+    
     console.log('Edit Article:', articleToUpdate);
     try {
       setSpinnerOn(true);
@@ -149,7 +191,7 @@ useEffect (() => {
           
         </nav>
         <Routes>
-          <Route path="/login" element={<LoginForm login={login} />} />
+          <Route path="/login" element={<LoginForm login={login} />} />{/* <-- do not change this line */}
           <Route path="/articles" 
           element={
             <ProtectedRoute>
@@ -175,8 +217,9 @@ useEffect (() => {
         <footer>Bloom Institute of Technology 2022</footer>
       </div>
     </>
-  );
-};
+  )
+        }
 
-export default App;
+        export default App;
+
 

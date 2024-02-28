@@ -133,49 +133,33 @@ useEffect(() => {
 
 }, [articles]);*/
 
-  const postArticle = async (newArticle) => {
-     //const postArticle = article => {
-    // ✨ implement
-    // The flow is very similar to the `getArticles` function.
-    // You'll know what to do! Use log statements or breakpoints
-    // to inspect the response from the server.
-  //}
+const postArticle = async (newArticle) => {
+  try {
+    setSpinnerOn(true);
+    const response = await axiosWithAuth().post(articlesUrl, newArticle);
+    const createdArticle = response.data.article || response.data; // Adjust based on actual response structure
+    setArticles(currentArticles => [...currentArticles, createdArticle]);
+    console.log("postArticle, Articles after add:", articles);
+    setMessage('Article added successfully.');
+  } catch (error) {
+    console.error('Error posting article:', error);
+    setMessage(`Failed to add article: ${error.toString()}`);
+  } finally {
+    setSpinnerOn(false);
+  }
+};
 
-    try {
-      setSpinnerOn(true);
-      const { data } = await axiosWithAuth().post(articlesUrl, newArticle);
-      //await axiosWithAuth().post(articlesUrl, newArticle);
-      //await getArticles() //fetch and update article state
-      //setArticles(prevArticles => [...prevArticles, data.article]);
-      setArticles(currentArticles => [...currentArticles, data.newArticle]);
-      console.log("postArticle, Articles after add:", articles)
-      setMessage('Article added successfully.');
-    } catch (error) {
-      console.error('Error posting article:', error) 
-      setMessage(`Failed to add article: ${error.toString()}`);
-    } finally {
-      setSpinnerOn(false);
-    }
-  };
     
   const updateArticle = async (articleToUpdate) => {
-    
-    console.log('Edit Article:', articleToUpdate);
     try {
       setSpinnerOn(true);
       const { data } = await axiosWithAuth().put(`/articles/${articleToUpdate.article_id}`, articleToUpdate);
-      setArticles(currentArticles => {
-        return currentArticles.map(article => {
-          if (article.article_is === articleToUpdate.article_id) {
-            //returning updated article data
-            return { ...article, ...articleToUpdate };
-        }
-        return article; //return unchanged article as-is
-      })
-    })
+      setArticles(currentArticles => currentArticles.map(article => 
+        article.article_id === articleToUpdate.article_id ? { ...article, ...data.updatedArticle } : article
+      ));
       setMessage(`Article updated successfully.`);
     } catch (error) {
-      console.error('Error updating article:', error)
+      console.error('Error updating article:', error);
       setMessage(`Failed to update article: ${error.toString()}`);
     } finally {
       setSpinnerOn(false);
@@ -183,23 +167,19 @@ useEffect(() => {
   };
    
   const deleteArticle = async (article_id) => {
-    console.log('Delete Article:', article_id);
-    console.log("Articles before delete:", articles);  
     try {
       setSpinnerOn(true);
       await axiosWithAuth().delete(`/articles/${article_id}`);
-      //await getArticles(); //Refresh articles list
-      //setArticles(prevArticles => prevArticles.filter(article => article.article_id !== article_id));
       setArticles(currentArticles => currentArticles.filter(article => article.article_id !== article_id));
       setMessage(`Article deleted successfully.`);
-      //await getArticles(); //Refresh articles list
     } catch (error) {
-      console.error('Error deleting article:', error)
+      console.error('Error deleting article:', error);
       setMessage(`Failed to delete article: ${error.toString()}`);
     } finally {
       setSpinnerOn(false);
     }
-  }
+  };
+  
 
   const updateArticleState = (updatedArticle) => {
     setArticles(currentArticles =>

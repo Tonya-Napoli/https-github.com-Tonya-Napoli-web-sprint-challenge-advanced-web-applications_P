@@ -51,10 +51,11 @@ export default function ArticleForm({
     // ✨ implement
     // We must submit a new post or update an existing one,
     // depending on the truthyness of the `currentArticle` prop.
-    console.log('Submitting form:', values);
+    console.log('Submitting form:', currentArticle, values);
     if (currentArticle) {
       updateArticle({ ...values, article_id: currentArticle.article_id});
     } else {
+      console.log('Attempting to post new article')
       postArticle(values);
     }
     setValues(initialFormValues); //resetting form submission

@@ -102,13 +102,17 @@ const App = () => {
     // Don't forget to turn off the spinner!
     try {
       setSpinnerOn(true);
-      const { data } = await axiosWithAuth().get(articlesUrl);
+      //const { data } = await axiosWithAuth().get(articlesUrl);
+      const response = await axiosWithAuth().get(articlesUrl);
+      const data = response.data;
       setArticles(data.articles);
       console.log('Articles successfully fetched:', data.articles);
       setMessage(data.message);
     } catch (error) {
       setMessage('Failed to fetch articles: ' + error.toString());
-      if (error.response?.status === 401) redirectToLogin();
+      if (error.response?.status === 401) {
+         redirectToLogin();
+      }
     } finally {
       setSpinnerOn(false);
     }
@@ -139,9 +143,11 @@ useEffect(() => {
 
     try {
       setSpinnerOn(true);
-      const { data } = await axiosWithAuth().post('/articles', newArticle);
-      await getArticles()
-      setArticles(prevArticles => [...prevArticles, data.article]);
+      const { data } = await axiosWithAuth().post(articlesUrl, newArticle);
+      //await axiosWithAuth().post(articlesUrl, newArticle);
+      //await getArticles() //fetch and update article state
+      //setArticles(prevArticles => [...prevArticles, data.article]);
+      setArticles(currentArticles => [...currentArticles, data.newArticle]);
       console.log("postArticle, Articles after add:", articles)
       setMessage('Article added successfully.');
     } catch (error) {
@@ -158,8 +164,16 @@ useEffect(() => {
     try {
       setSpinnerOn(true);
       const { data } = await axiosWithAuth().put(`/articles/${articleToUpdate.article_id}`, articleToUpdate);
+      setArticles(currentArticles => {
+        return currentArticles.map(article => {
+          if (article.article_is === articleToUpdate.article_id) {
+            //returning updated article data
+            return { ...article, ...articleToUpdate };
+        }
+        return article; //return unchanged article as-is
+      })
+    })
       setMessage(`Article updated successfully.`);
-      await getArticles(); //Refresh articles list
     } catch (error) {
       console.error('Error updating article:', error)
       setMessage(`Failed to update article: ${error.toString()}`);
@@ -174,7 +188,9 @@ useEffect(() => {
     try {
       setSpinnerOn(true);
       await axiosWithAuth().delete(`/articles/${article_id}`);
-      setArticles(prevArticles => prevArticles.filter(article => article.article_id !== article_id));
+      //await getArticles(); //Refresh articles list
+      //setArticles(prevArticles => prevArticles.filter(article => article.article_id !== article_id));
+      setArticles(currentArticles => currentArticles.filter(article => article.article_id !== article_id));
       setMessage(`Article deleted successfully.`);
       //await getArticles(); //Refresh articles list
     } catch (error) {

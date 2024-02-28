@@ -30,8 +30,7 @@ const App = () => {
   const [message, setMessage] = useState('');
   const [articles, setArticles] = useState([]);
   const [spinnerOn, setSpinnerOn] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);   
-  const [forceUpdate, setForceUpdate] = useState(0);
+  const [isLoggedIn, setIsLoggedIn] = useState(() => !!localStorage.getItem('token'));  
   const navigate = useNavigate();
  
   const [currentArticleId, setCurrentArticleId] = useState(null);
@@ -124,21 +123,13 @@ useEffect(() => {
   }
 }, [isLoggedIn]);
 
-useEffect(() => {
-  setIsLoggedIn(!!localStorage.getItem('token'));
-}, []);
-
-/*useEffect (() => {
-  console.log("Current articles state:", articles)
-
-}, [articles]);*/
-
 const postArticle = async (newArticle) => {
   try {
     setSpinnerOn(true);
     const response = await axiosWithAuth().post(articlesUrl, newArticle);
     const createdArticle = response.data.article || response.data; // Adjust based on actual response structure
     setArticles(currentArticles => [...currentArticles, createdArticle]);
+    await getArticles(); // Update articles state with new article
     console.log("postArticle, Articles after add:", articles);
     setMessage('Article added successfully.');
   } catch (error) {
@@ -148,8 +139,7 @@ const postArticle = async (newArticle) => {
     setSpinnerOn(false);
   }
 };
-
-    
+   
   const updateArticle = async (articleToUpdate) => {
     try {
       setSpinnerOn(true);
@@ -157,6 +147,7 @@ const postArticle = async (newArticle) => {
       setArticles(currentArticles => currentArticles.map(article => 
         article.article_id === articleToUpdate.article_id ? { ...article, ...data.updatedArticle } : article
       ));
+      await getArticles(); // Update articles state with updated article
       setMessage(`Article updated successfully.`);
     } catch (error) {
       console.error('Error updating article:', error);
@@ -171,6 +162,7 @@ const postArticle = async (newArticle) => {
       setSpinnerOn(true);
       await axiosWithAuth().delete(`/articles/${article_id}`);
       setArticles(currentArticles => currentArticles.filter(article => article.article_id !== article_id));
+      await getArticles(); // Update articles state with deleted article
       setMessage(`Article deleted successfully.`);
     } catch (error) {
       console.error('Error deleting article:', error);
@@ -179,9 +171,8 @@ const postArticle = async (newArticle) => {
       setSpinnerOn(false);
     }
   };
-  
 
-  const updateArticleState = (updatedArticle) => {
+    const updateArticleState = (updatedArticle) => {
     setArticles(currentArticles =>
       currentArticles.map(article =>
         article.article_id === updatedArticle.article_id ? updatedArticle: article

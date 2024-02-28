@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import PT from 'prop-types'
 
-
 const initialFormValues = { title: '', text: '', topic: '' }
 
 export default function ArticleForm({
@@ -45,7 +44,6 @@ export default function ArticleForm({
     }));
   };
      
-
   const onSubmit = evt => {
     evt.preventDefault()
     // ✨ implement

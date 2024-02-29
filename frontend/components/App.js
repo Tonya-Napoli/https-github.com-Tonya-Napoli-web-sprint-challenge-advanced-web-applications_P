@@ -36,7 +36,7 @@ const App = () => {
   const [currentArticleId, setCurrentArticleId] = useState(null);
   const editArticle = (article_id) => {
     setCurrentArticleId(article_id);
-    //setCurrentArticleId(articleToEdit)
+    console.log(`Current Article ID set to: ${article_id}`)
   }
 
   // Check token presence to manage access to private routes
@@ -127,14 +127,14 @@ const postArticle = async (newArticle) => {
   try {
     setSpinnerOn(true);
     const response = await axiosWithAuth().post(articlesUrl, newArticle);
-    const createdArticle = response.data.article || response.data; // Adjust based on actual response structure
-    setArticles(currentArticles => [...currentArticles, createdArticle]);
+    const { message } = response.data;
+    setArticles(currentArticles => [...currentArticles, response.data.article]);
     await getArticles(); // Update articles state with new article
-    console.log("postArticle, Articles after add:", articles);
-    setMessage('Article added successfully.');
+    //console.log("postArticle, Articles after add:", articles);
+    setMessage(message);
   } catch (error) {
     console.error('Error posting article:', error);
-    setMessage(`Failed to add article: ${error.toString()}`);
+    setMessage(`Failed to add article: ${error.response?.data?.message || error.message}`);
   } finally {
     setSpinnerOn(false);
   }
@@ -160,13 +160,13 @@ const postArticle = async (newArticle) => {
   const deleteArticle = async (article_id) => {
     try {
       setSpinnerOn(true);
-      await axiosWithAuth().delete(`/articles/${article_id}`);
-      setArticles(currentArticles => currentArticles.filter(article => article.article_id !== article_id));
+      const response = await axiosWithAuth().delete(`/articles/${article_id}`);
+      const { message } = response.data;
       await getArticles(); // Update articles state with deleted article
-      setMessage(`Article deleted successfully.`);
+      setMessage(message);
     } catch (error) {
       console.error('Error deleting article:', error);
-      setMessage(`Failed to delete article: ${error.toString()}`);
+      setMessage(error.response?.data?.message || `Failed to delete article: ${error.message}`);
     } finally {
       setSpinnerOn(false);
     }

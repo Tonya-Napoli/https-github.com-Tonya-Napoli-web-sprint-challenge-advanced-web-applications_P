@@ -1,17 +1,20 @@
 import React, { useEffect, useState } from 'react'
 import PT from 'prop-types'
 
+
 const initialFormValues = { title: '', text: '', topic: '' }
 
+
 export default function ArticleForm({
-  postArticle, 
-  updateArticle, 
-  setCurrentArticleId, 
+  postArticle,
+  updateArticle,
+  setCurrentArticleId,
   currentArticle
 }) {
   const [values, setValues] = useState(initialFormValues)
   console.log('ArticleFormProps:, { currentArticle, updateArticle, setCurrentArticleId }')
   // ✨ where are my props? Destructure them here
+
 
   useEffect(() => {
     // ✨ implement
@@ -34,6 +37,7 @@ export default function ArticleForm({
     // if it's truthy, we should set its title, text and topic into the corresponding
     // values of the form. If it's not, we should reset the form back to initial values.
   }, [currentArticle]);
+
 
   const onChange = evt => {
     const { id, value } = evt.target;
@@ -60,17 +64,20 @@ export default function ArticleForm({
     setCurrentArticleId(null); //resetting current article ID to null after editing
   }
 
+
   const isDisabled = () => {
     return !values.title.trim() || !values.text.trim() || !values.topic.trim();
     // ✨ implement
     // Make sure the inputs have some values
   };
 
+
   const onCancelEdit = (evt) => {
     evt.preventDefault(); // Prevent form submission
     setValues(initialFormValues); // Reset form values
     setCurrentArticleId(null); // Clear the current article selection
   };
+
 
   return (
     // ✨ fix the JSX: make the heading display either "Edit" or "Create"
@@ -105,6 +112,7 @@ export default function ArticleForm({
       </form>
     );
   }
+
 
 // 🔥 No touchy: LoginForm expects the following props exactly:
 ArticleForm.propTypes = {

@@ -10,7 +10,7 @@ import Spinner from './Spinner';
 })*/
 
 //does spinner render when 'on' prop is true?
-test('spinner renders when on prop is true', () => {
+/*test('spinner renders when on prop is true', () => {
   render((<Spinner on={true} />));
   const spinnerElement = screen.getByTestId(/Please wait.../i);
   expect(spinnerElement).toBeInTheDocument();
@@ -21,4 +21,19 @@ test('spinner does not render when on prop is false', () => {
   render(<Spinner on={false} />);
   const spinnerElement = screen.queryByTestId(/Please wait.../i);
   expect(spinnerElement).not.toBeInTheDocument();
+});*/
+
+// Test that the spinner renders when `on` prop is true
+test('spinner renders when on prop is true', () => {
+  render(<Spinner on={true} />);
+  const spinnerElement = screen.getByText(/Please wait.../i); // Use getByText with regex for case-insensitive match
+  expect(spinnerElement).toBeInTheDocument();
 });
+
+// Test that the spinner does not render when `on` prop is false
+test('spinner does not render when on prop is false', () => {
+  render(<Spinner on={false} />);
+  const spinnerElement = screen.queryByText(/Please wait.../i); // Use queryByText for potential absence
+  expect(spinnerElement).not.toBeInTheDocument();
+});
+

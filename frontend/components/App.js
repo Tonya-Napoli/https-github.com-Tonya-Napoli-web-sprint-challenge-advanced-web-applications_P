@@ -143,12 +143,13 @@ const postArticle = async (newArticle) => {
   const updateArticle = async (articleToUpdate) => {
     try {
       setSpinnerOn(true);
-      const { data } = await axiosWithAuth().put(`/articles/${articleToUpdate.article_id}`, articleToUpdate);
+      const response = await axiosWithAuth().put(`/articles/${articleToUpdate.article_id}`, articleToUpdate);
+      const { message } = response.data;
       setArticles(currentArticles => currentArticles.map(article => 
-        article.article_id === articleToUpdate.article_id ? { ...article, ...data.updatedArticle } : article
+        article.article_id === articleToUpdate.article_id ? { ...article, ...response.data.updatedArticle } : article
       ));
       await getArticles(); // Update articles state with updated article
-      setMessage(`Article updated successfully.`);
+      setMessage(message);
     } catch (error) {
       console.error('Error updating article:', error);
       setMessage(`Failed to update article: ${error.toString()}`);

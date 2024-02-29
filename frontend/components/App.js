@@ -199,6 +199,7 @@ const postArticle = async (newArticle) => {
             <ProtectedRoute>
               <>
                 <ArticleForm
+                  articles={articles}
                   updateArticle= {updateArticle}
                   setCurrentArticleId={setCurrentArticleId}
                   postArticle= {postArticle}

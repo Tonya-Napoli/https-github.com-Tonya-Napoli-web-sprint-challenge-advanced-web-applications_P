@@ -17,26 +17,19 @@ export default function ArticleForm({
   console.log('ArticleFormProps:, { currentArticle, updateArticle, setCurrentArticleId }')
   // ✨ where are my props? Destructure them here
 
-
   useEffect(() => {
-    // ✨ implement
-    // Every time the `currentArticle` prop changes, we should check it for truthiness:
-    // if it's truthy, we should set its title, text and topic into the corresponding
-    // values of the form. If it's not, we should reset the form back to initial values.
     console.log('ArticleForm useEffect running, currentArticle', currentArticle);
-    if (currentArticleId !== null && articles){
-    const articleToEdit = articles.find(article => article.article_id === currentArticleId);
-    if (articleToEdit) {
+    if (currentArticle) { // Check if currentArticle is truthy
       setValues({
-        title: articleToEdit.title,
-        text: articleToEdit.text,
-        topic: articleToEdit.topic,
+        title: currentArticle.title,
+        text: currentArticle.text,
+        topic: currentArticle.topic,
       });
-    }
     } else {
-      setValues(initialFormValues);
+      setValues(initialFormValues); // Reset the form to initial values if currentArticle is falsy
     }
-    }, [currentArticleId, articles]);
+  }, [currentArticle]); // Depend on currentArticle to run this effect
+  
    
     // ✨ implement
     // Every time the `currentArticle` prop changes, we should check it for truthiness:

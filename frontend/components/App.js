@@ -32,8 +32,8 @@ const App = () => {
   const [spinnerOn, setSpinnerOn] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(() => !!localStorage.getItem('token'));  
   const navigate = useNavigate();
- 
   const [currentArticleId, setCurrentArticleId] = useState(null);
+  const currentArticle = articles.find(article => article.article_id === currentArticleId);
   const editArticle = (article_id) => {
     setCurrentArticleId(article_id);
     console.log(`Current Article ID set to: ${article_id}`)
@@ -180,6 +180,8 @@ const postArticle = async (newArticle) => {
         );
       };
 
+      console.log("App.js, Current article in App.js:", currentArticle);
+
   return (
     <>
       <Spinner on={spinnerOn} />
@@ -204,6 +206,7 @@ const postArticle = async (newArticle) => {
                   setCurrentArticleId={setCurrentArticleId}
                   postArticle= {postArticle}
                   currentArticleId={articles.find(article => article.article_id === currentArticleId)}
+                  currentArticle={currentArticle}
                 />
                 <Articles
                   getArticles={getArticles}
